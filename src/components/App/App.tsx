@@ -12,33 +12,28 @@ import type { Movie } from "../../types/movie";
 import ReactPaginate from "react-paginate";
 
 function App() {
-  const [movies, setMovies] = useState<Movie[]>([]);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
-  const [topic, setTopic] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
   const { data, isLoading, isError, isSuccess } = useQuery({
-    queryKey: ["movie", topic, currentPage],
-    queryFn: () => fetchMovies(topic, currentPage),
-    enabled: topic !== "",
+    queryKey: ["movies", searchQuery, currentPage],
+    queryFn: () => fetchMovies(searchQuery, currentPage),
+    enabled: searchQuery !== "",
     placeholderData: keepPreviousData,
   });
 
   const totalPages = data?.total_pages ?? 0;
 
   useEffect(() => {
-    if (isSuccess) {
-      setMovies(data.results);
-      if (data.results.length === 0) {
-        toast("No movies found for your request.");
-      }
+    if (isSuccess && data?.results.length === 0) {
+      toast("No movies found for your request.");
     }
   }, [isSuccess, data]);
 
   const handleSearch = async (query: string) => {
-    setTopic(query);
+    setSearchQuery(query);
     setCurrentPage(1);
-    setMovies([]);
   };
 
   const handleSelectMovie = (movie: Movie) => {
@@ -72,8 +67,8 @@ function App() {
       {selectedMovie && (
         <MovieModal movie={selectedMovie} onClose={closeModal} />
       )}
-      {movies.length > 0 && (
-        <MovieGrid movies={movies} onSelect={handleSelectMovie} />
+      {isSuccess && data.results.length > 0 && (
+        <MovieGrid movies={data.results} onSelect={handleSelectMovie} />
       )}
     </>
   );
