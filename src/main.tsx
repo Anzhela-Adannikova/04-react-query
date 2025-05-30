@@ -1,10 +1,17 @@
-import { StrictMode } from "react";
+// import React from "react";
 import { createRoot } from "react-dom/client";
-import "./index.css";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+// import ReactPaginate from "react-paginate/index";
+// import "./types/global.css";
+import "modern-normalize";
 import App from "./components/App/App.tsx";
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
+const queryClient = new QueryClient();
+
+createRoot(document.getElementById("root") as HTMLElement).render(
+  <QueryClientProvider client={queryClient}>
     <App />
-  </StrictMode>
+    <ReactQueryDevtools initialIsOpen={false} />
+  </QueryClientProvider>
 );
